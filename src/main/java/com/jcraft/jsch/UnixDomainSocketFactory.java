@@ -33,6 +33,8 @@ import com.jcraft.jsch.AgentProxyException;
 import com.jcraft.jsch.USocketFactory;
 
 import java.io.IOException;
+import java.net.StandardProtocolFamily;
+import java.net.UnixDomainSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Path;
@@ -40,16 +42,23 @@ import java.nio.file.Path;
 public class UnixDomainSocketFactory implements USocketFactory {
 
   public UnixDomainSocketFactory() throws AgentProxyException {
-    throw new AgentProxyException("UnixDomainSocketFactory requires Java16+.");
   }
 
   @Override
   public SocketChannel connect(Path path) throws IOException {
-    throw new UnsupportedOperationException("UnixDomainSocketFactory requires Java16+.");
+    UnixDomainSocketAddress sockAddr = UnixDomainSocketAddress.of(path);
+    SocketChannel sock = SocketChannel.open(StandardProtocolFamily.UNIX);
+    sock.configureBlocking(true);
+    sock.connect(sockAddr);
+    return sock;
   }
 
   @Override
   public ServerSocketChannel bind(Path path) throws IOException {
-    throw new UnsupportedOperationException("UnixDomainSocketFactory requires Java16+.");
+    UnixDomainSocketAddress sockAddr = UnixDomainSocketAddress.of(path);
+    ServerSocketChannel sock = ServerSocketChannel.open(StandardProtocolFamily.UNIX);
+    sock.configureBlocking(true);
+    sock.bind(sockAddr);
+    return sock;
   }
 }
